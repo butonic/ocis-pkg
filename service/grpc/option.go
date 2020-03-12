@@ -4,6 +4,9 @@ import (
 	"context"
 
 	"github.com/micro/cli/v2"
+	"github.com/micro/go-micro/v2/client"
+	"github.com/micro/go-micro/v2/client/grpc"
+	"github.com/micro/go-micro/v2/transport"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
@@ -18,6 +21,8 @@ type Options struct {
 	Version   string
 	Address   string
 	Context   context.Context
+	Client    client.Client
+	Transport transport.Transport
 	Flags     []cli.Flag
 }
 
@@ -29,6 +34,14 @@ func newOptions(opts ...Option) Options {
 
 	for _, o := range opts {
 		o(&opt)
+	}
+
+	if opt.Client == nil {
+		opt.Client = grpc.NewClient()
+	}
+
+	if opt.Transport == nil {
+		opt.Transport = transport.DefaultTransport
 	}
 
 	return opt
@@ -80,5 +93,19 @@ func Context(ctx context.Context) Option {
 func Flags(flags ...cli.Flag) Option {
 	return func(o *Options) {
 		o.Flags = append(o.Flags, flags...)
+	}
+}
+
+// Client provides a function to set the client option.
+func Client(c client.Client) Option {
+	return func(o *Options) {
+		o.Client = c
+	}
+}
+
+// Transport provides a function to set the transport option.
+func Transport(t transport.Transport) Option {
+	return func(o *Options) {
+		o.Transport = t
 	}
 }
