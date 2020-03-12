@@ -19,20 +19,13 @@ func NewService(opts ...Option) Service {
 	sopts := newOptions(opts...)
 
 	sopts.Logger.Info().
-		Str("transport", "grpc").
+		Str("client", sopts.Client.String()).
+		Str("transport", sopts.Transport.String()).
 		Str("addr", sopts.Address).
 		Msg("Starting server")
 
 	mopts := []micro.Option{
-		micro.Name(
-			strings.Join(
-				[]string{
-					sopts.Namespace,
-					sopts.Name,
-				},
-				".",
-			),
-		),
+		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
 		micro.Address(sopts.Address),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
@@ -42,12 +35,11 @@ func NewService(opts ...Option) Service {
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 		micro.Context(sopts.Context),
-		// micro.Flags(sopts.Flags...),
+		micro.Transport(sopts.Transport),
+		micro.Client(sopts.Client),
 	}
 
 	return Service{
-		micro.NewService(
-			mopts...,
-		),
+		micro.NewService(mopts...),
 	}
 }
