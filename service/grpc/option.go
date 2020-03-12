@@ -7,6 +7,7 @@ import (
 	"github.com/micro/go-micro/v2/client"
 	"github.com/micro/go-micro/v2/client/grpc"
 	"github.com/micro/go-micro/v2/transport"
+	grpcT "github.com/micro/go-micro/v2/transport/grpc"
 	"github.com/owncloud/ocis-pkg/v2/log"
 )
 
@@ -41,7 +42,7 @@ func newOptions(opts ...Option) Options {
 	}
 
 	if opt.Transport == nil {
-		opt.Transport = transport.DefaultTransport
+		opt.Transport = grpcT.NewTransport()
 	}
 
 	return opt
